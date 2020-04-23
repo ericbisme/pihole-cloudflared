@@ -1,0 +1,38 @@
+{{- if not .Values.persistence.pihole.claimName }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "pihole-cloudflared.fullname" . }}-pihole
+  labels:
+    {{- include "pihole-cloudflared.labels" . | nindent 4 }}
+    component: pihole
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.persistence.pihole.size | quote }}
+{{- if .Values.persistence.pihole.storageClass }}
+  storageClassName: {{ .Values.persistence.pihole.storageClass | quote }}
+{{- end }}
+---
+{{- end }}
+{{- if not .Values.persistence.dnsmasqd.claimName }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "pihole-cloudflared.fullname" . }}-dnsmasqd
+  labels:
+    {{- include "pihole-cloudflared.labels" . | nindent 4 }}
+    component: dnsmasqd
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.persistence.dnsmasqd.size | quote }}
+{{- if .Values.persistence.dnsmasqd.storageClass }}
+  storageClassName: {{ .Values.persistence.dnsmasqd.storageClass | quote }}
+{{- end }}
+---
+{{- end }}

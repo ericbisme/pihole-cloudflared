@@ -1,0 +1,140 @@
+---
+
+replicaCount: 1
+
+image:
+  pihole:
+    repository: pihole/pihole
+    tag: latest
+    pullPolicy: IfNotPresent
+  cloudflared:
+    repository: travisez13/cloudflared-proxy-dns
+    tag: latest
+    pullPolicy: IfNotPresent
+  exporter:
+    repository: ekofr/pihole-exporter
+    tag: latest
+    pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 2001
+
+service:
+  type:               ClusterIP
+  type_dns:           LoadBalancer
+  loadBalancerIP_dns: ""
+  port:
+    dns:     53
+    http:    80
+    https:   443
+    metrics: 9617
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  path: /
+  hosts:
+    - chart-example.local
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+persistence:
+  pihole:
+    # Optionally specify claimName to manually override the PVC to be used for
+    # the pihole directory. If claimName is specified, storageClass and size
+    # are ignored.
+    ## claimName: "dns-pihole-pvc"
+    # Optionally specify a storage class to be used for the pihole directory.
+    # If not specified and claimName is not specified, the default storage
+    # class will be used.
+    storageClass: ""
+    # The requested size of the volume to be used when creating a
+    # PersistentVolumeClaim.
+    size: 50Mi
+  dnsmasqd:
+    # Optionally specify claimName to manually override the PVC to be used for
+    # the data directory. If claimName is specified, storageClass and size are
+    # ignored.
+    ## claimName: "dns-dnsmasqd-pvc"
+    # Optionally specify a storage class to be used for the data directory.
+    # If not specified and claimName is not specified, the default storage
+    # class will be used.
+    storageClass: ""
+    # The requested size of the volume to be used when creating a
+    # PersistentVolumeClaim.
+    size: 50Mi
+
+config:
+  setupVars:
+    WEBPASSWORD: ""
+    PIHOLE_INTERFACE: ""
+    IPV4_ADDRESS: ""
+    IPV6_ADDRESS: ""
+    QUERY_LOGGING: "true"
+    INSTALL_WEB: "true"
+    DNSMASQ_LISTENING: "single"
+    PIHOLE_DNS_1: "127.0.0.1#5353"
+    PIHOLE_DNS_2: ""
+    PIHOLE_DNS_3: ""
+    PIHOLE_DNS_4: ""
+    DNS_FQDN_REQUIRED: "true"
+    DNS_BOGUS_PRIV: "true"
+    DNSSEC: "false"
+    TEMPERATUREUNIT: "F"
+    WEBUIBOXEDLAYOUT: "traditional"
+    API_EXCLUDE_DOMAINS: ""
+    API_EXCLUDE_CLIENTS: ""
+    API_QUERY_LOG_SHOW: "all"
+    API_PRIVACY_MODE: "true"
+
+# Additional Dnsmasq config to be placed in /etc/dnsmasq.d/100-add-dnsmasq.conf
+# Can be used to hard code in local DNS entries not handled by DHCP. Originally conceived
+# to provide DNS for IPS created by MetalLB for local LAN.
+add_dnsmasq: >-
+  #Add additional dnsmasq configs here
+
+exporter:
+  pihole_hostname: ""
+  pihole_password: ""
+  port: ""
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

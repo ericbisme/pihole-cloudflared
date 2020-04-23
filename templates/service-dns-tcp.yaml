@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "pihole-cloudflared.fullname" . }}-dns-tcp
+  labels:
+    {{- include "pihole-cloudflared.labels" . | nindent 4 }}
+  annotations:
+    metallb.universe.tf/allow-shared-ip: {{ template "pihole-cloudflared.fullname" . }}
+spec:
+  type: {{ .Values.service.type_dns }}
+  loadBalancerIP: {{ .Values.service.loadBalancerIP_dns }}
+  ports:
+    - name: dnstcp
+      port: {{ .Values.service.port.dns }}
+      protocol: TCP
+    - name: cloudflared
+      port: {{ .Values.service.port.dns }}{{ .Values.service.port.dns }}
+      protocol: TCP
+  selector:
+    {{- include "pihole-cloudflared.selectorLabels" . | nindent 4 }}
