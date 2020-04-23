@@ -32,7 +32,7 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+          image: "{{ .Values.image.pihole.repository }}:{{ .Values.image.pihole.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           volumeMounts:
           - name: {{ template "pihole-cloudflared.fullname" . }}-pihole
@@ -52,20 +52,22 @@ spec:
           - name: dnsudp
             containerPort: {{ .Values.service.port.dns }}
             protocol: UDP
-          - name: metrics
-            containerPort: {{ .Values.service.port.metrics }}
-            protocol: TCP
+          startupProbe:
+            exec:
+              command:
+              - ls
+              - /etc/pihole
+            failureThreshold: 30
+            periodSeconds: 5
           livenessProbe:
             exec:
               command:
               - ls
               - /etc/pihole
-            initialDelaySeconds: 120
           readinessProbe:
             httpGet:
               path: /
               port: {{ .Values.service.port.http }}
-            initialDelaySeconds: 120
           env:
           - name: ServerIP
             value: {{ .Values.config.setupVars.IPV4_ADDRESS }}

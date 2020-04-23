@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "pihole-cloudflared.labels" . | nindent 4 }}
   annotations:
-    metallb.universe.tf/allow-shared-ip: {{ template "pihole-cloudflared.fullname" . }}
+    metallb.universe.tf/allow-shared-ip: {{ template "pihole-cloudflared.fullname" . }}-dns
 spec:
   type: {{ .Values.service.type_dns }}
   loadBalancerIP: {{ .Values.service.loadBalancerIP_dns }}
