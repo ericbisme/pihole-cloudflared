@@ -3,6 +3,7 @@
 replicaCount: 1
 
 image:
+  pullPolicy: IfNotPresent
   pihole:
     repository: pihole/pihole
     tag: latest
@@ -86,6 +87,24 @@ persistence:
     # The requested size of the volume to be used when creating a
     # PersistentVolumeClaim.
     size: 50Mi
+
+prometheus:
+  exporter:
+    enabled: false
+    port:    9617
+    path:    "/metrics"
+  operator:
+    enabled: false
+    alerts:
+      enabled: true
+      selector:
+        role: alert-rules
+      labels: {}
+
+    serviceMonitor:
+      interval: 60s
+      selector:
+        release: prometheus-operator
 
 config:
   setupVars:
